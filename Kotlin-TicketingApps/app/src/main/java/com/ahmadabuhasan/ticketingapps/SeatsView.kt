@@ -1,6 +1,9 @@
 package com.ahmadabuhasan.ticketingapps
 
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 
@@ -50,5 +53,23 @@ class SeatsView : View {
                 value += 300F
             }
         }
+    }
+
+    var seat: Seat? = null
+
+    private val backgroundPaint = Paint()
+    private val armrestPaint = Paint()
+    private val bottomSeatPaint = Paint()
+    private val mBounds = Rect()
+    private val numberSeatPaint = Paint(Paint.FAKE_BOLD_TEXT_FLAG)
+    private val titlePaint = Paint(Paint.FAKE_BOLD_TEXT_FLAG)
+
+    override fun onDraw(canvas: Canvas?) {
+        super.onDraw(canvas)
+
+        for (seat in seats) {
+            drawSeat(canvas, seat)
+        }
+
     }
 }
