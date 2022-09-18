@@ -3,9 +3,11 @@ package com.ahmadabuhasan.ticketingapps
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.res.ResourcesCompat
 
 class SeatsView : View {
 
@@ -71,5 +73,56 @@ class SeatsView : View {
             drawSeat(canvas, seat)
         }
 
+    }
+
+    private fun drawSeat(canvas: Canvas?, seat: Seat) {
+        // Mengatur Warna ketika Sudah Dibooking
+        if (seat.isBooked) {
+            backgroundPaint.color = ResourcesCompat.getColor(resources, R.color.grey_200, null)
+            armrestPaint.color = ResourcesCompat.getColor(resources, R.color.grey_200, null)
+            bottomSeatPaint.color = ResourcesCompat.getColor(resources, R.color.grey_200, null)
+            numberSeatPaint.color = ResourcesCompat.getColor(resources, R.color.black, null)
+        } else {
+            backgroundPaint.color = ResourcesCompat.getColor(resources, R.color.blue_500, null)
+            armrestPaint.color = ResourcesCompat.getColor(resources, R.color.blue_700, null)
+            bottomSeatPaint.color = ResourcesCompat.getColor(resources, R.color.blue_200, null)
+            numberSeatPaint.color = ResourcesCompat.getColor(resources, R.color.grey_200, null)
+        }
+
+        // Menyimpan State
+        canvas?.save()
+
+        // Background
+        canvas?.translate(seat.x as Float, seat.y as Float)
+
+        val backgroundPath = Path()
+        backgroundPath.addRect(0F, 0F, 200F, 200F, Path.Direction.CCW)
+        backgroundPath.addCircle(100F, 50F, 75F, Path.Direction.CCW)
+        canvas?.drawPath(backgroundPath, backgroundPaint)
+
+        // Sandaran Tangan
+        val armrestPath = Path()
+        armrestPath.addRect(0F, 0F, 50F, 200F, Path.Direction.CCW)
+        canvas?.drawPath(armrestPath, armrestPaint)
+        canvas?.translate(150F, 0F)
+        armrestPath.addRect(0F, 0F, 50F, 200F, Path.Direction.CCW)
+        canvas?.drawPath(armrestPath, armrestPaint)
+
+        // Bagian Bawah Kursi
+        canvas?.translate(-150F, 175F)
+        val bottomSeatPath = Path()
+        bottomSeatPath.addRect(0F, 0F, 200F, 25F, Path.Direction.CCW)
+        canvas?.drawPath(bottomSeatPath, bottomSeatPaint)
+
+        // Menulis Nomor Kursi
+        canvas?.translate(0F, -175F)
+        numberSeatPaint.apply {
+            textSize = 50F
+            numberSeatPaint.getTextBounds(seat.name, 0, seat.name.length, mBounds)
+        }
+        canvas?.drawText(seat.name, 100F - mBounds.centerX(), 100F, numberSeatPaint)
+
+        // Mengembalikan ke pengaturan sebelumnya
+        canvas?.restore()
     }
 }
