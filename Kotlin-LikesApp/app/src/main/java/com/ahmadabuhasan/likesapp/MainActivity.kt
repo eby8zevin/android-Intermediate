@@ -2,9 +2,8 @@ package com.ahmadabuhasan.likesapp
 
 import android.graphics.*
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.ahmadabuhasan.likesapp.databinding.ActivityMainBinding
 
@@ -146,8 +145,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showHair() {
+        // Menyimpan pengaturan canvas saat ini.
         mCanvas.save()
 
+        // Membuat kerangka object yang akan dipotong.
         val path = Path()
 
         path.addCircle(halfOfWidth - 100F, halfOfHeight - 10F, 150F, Path.Direction.CCW)
@@ -156,12 +157,14 @@ class MainActivity : AppCompatActivity() {
         val mouth = RectF(halfOfWidth - 250F, halfOfHeight, halfOfWidth + 250F, halfOfHeight + 500F)
         path.addOval(mouth, Path.Direction.CCW)
 
+        // Memotong object ke dalam Canvas.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             mCanvas.clipPath(path, Region.Op.DIFFERENCE)
         } else {
             mCanvas.clipOutPath(path)
         }
 
+        // Object yang tampil akan terpotong berdasarkan path yang telah diatur.
         val face = RectF(left, top, right, bottom)
 
         mPaint.color = ResourcesCompat.getColor(resources, R.color.brown_left_hair, null)
@@ -170,6 +173,7 @@ class MainActivity : AppCompatActivity() {
         mPaint.color = ResourcesCompat.getColor(resources, R.color.brown_right_hair, null)
         mCanvas.drawArc(face, 270F, 180F, false, mPaint)
 
+        // Mengembalikan posisi Canvas sebelum ada ditambahkan clip.
         mCanvas.restore()
     }
 }
