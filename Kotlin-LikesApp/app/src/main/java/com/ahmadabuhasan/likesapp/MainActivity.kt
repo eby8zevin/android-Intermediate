@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
             showMouth(true)
             showEyes()
             showNose()
+            showHair()
         }
 
         binding.dislike.setOnClickListener {
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
             showMouth(false)
             showEyes()
             showNose()
+            showHair()
         }
     }
 
