@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         showFace()
         showEyes()
+        showMouth(true)
     }
 
     private val halfOfWidth = (mBitmap.width / 2).toFloat()
