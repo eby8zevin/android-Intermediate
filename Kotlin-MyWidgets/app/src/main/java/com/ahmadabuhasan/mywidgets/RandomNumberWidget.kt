@@ -82,6 +82,7 @@ class RandomNumberWidget : AppWidgetProvider() {
     }
 }
 
+/*
 internal fun updateAppWidget(
     context: Context,
     appWidgetManager: AppWidgetManager,
@@ -96,4 +97,4 @@ internal fun updateAppWidget(
 
     // Instruct the widget manager to update the widget
     appWidgetManager.updateAppWidget(appWidgetId, views)
-}
+}*/
