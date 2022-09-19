@@ -118,4 +118,10 @@ class MainActivity : AppCompatActivity() {
         val y = 50F
         mCanvas.drawText(message, x, y, mPaintText)
     }
+
+    private fun showNose() {
+        mPaint.color = ResourcesCompat.getColor(resources, R.color.black, null)
+        mCanvas.drawCircle(halfOfWidth - 40F, halfOfHeight + 140F, 15F, mPaint)
+        mCanvas.drawCircle(halfOfWidth + 40F, halfOfHeight + 140F, 15F, mPaint)
+    }
 }
