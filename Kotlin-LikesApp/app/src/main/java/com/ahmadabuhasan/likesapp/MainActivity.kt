@@ -126,4 +126,16 @@ class MainActivity : AppCompatActivity() {
         mCanvas.drawCircle(halfOfWidth - 40F, halfOfHeight + 140F, 15F, mPaint)
         mCanvas.drawCircle(halfOfWidth + 40F, halfOfHeight + 140F, 15F, mPaint)
     }
+
+    private fun showEars() {
+        mPaint.color = ResourcesCompat.getColor(resources, R.color.brown_left_hair, null)
+        mCanvas.drawCircle(halfOfWidth - 300F, halfOfHeight - 100F, 100F, mPaint)
+
+        mPaint.color = ResourcesCompat.getColor(resources, R.color.brown_right_hair, null)
+        mCanvas.drawCircle(halfOfWidth + 300F, halfOfHeight - 100F, 100F, mPaint)
+
+        mPaint.color = ResourcesCompat.getColor(resources, R.color.red_ear, null)
+        mCanvas.drawCircle(halfOfWidth - 300F, halfOfHeight - 100F, 60F, mPaint)
+        mCanvas.drawCircle(halfOfWidth + 300F, halfOfHeight - 100F, 60F, mPaint)
+    }
 }
