@@ -23,6 +23,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.imageView.setImageBitmap(mBitmap)
+
+        showFace()
     }
 
     private val halfOfWidth = (mBitmap.width / 2).toFloat()
