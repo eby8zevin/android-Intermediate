@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
         showText()
 
         binding.like.setOnClickListener {
+            showEars()
             showFace()
             showMouth(true)
             showEyes()
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.dislike.setOnClickListener {
+            showEars()
             showFace()
             showMouth(false)
             showEyes()
