@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.widget.RemoteViews
+import android.widget.Toast
 import androidx.core.net.toUri
 
 /**
@@ -45,6 +46,16 @@ class ImageBannerWidget : AppWidgetProvider() {
             views.setPendingIntentTemplate(R.id.stack_view, toastPendingIntent)
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
+        }
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        if (intent.action != null) {
+            if (intent.action == TOAST_ACTION) {
+                val viewIndex = intent.getIntExtra(EXTRA_ITEM, 0)
+                Toast.makeText(context, "Touched view $viewIndex", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
