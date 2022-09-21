@@ -11,5 +11,6 @@ class MainActivity : AppCompatActivity() {
 
         val webView = findViewById<WebView>(R.id.webView)
         webView.loadUrl("https://www.dicoding.com")
+        webView.settings.javaScriptEnabled = true
     }
 }
