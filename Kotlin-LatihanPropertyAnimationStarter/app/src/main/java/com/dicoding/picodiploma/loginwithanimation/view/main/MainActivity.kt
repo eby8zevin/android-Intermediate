@@ -1,5 +1,6 @@
 package com.dicoding.picodiploma.loginwithanimation.view.main
 
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
@@ -84,5 +85,14 @@ class MainActivity : AppCompatActivity() {
             ObjectAnimator.ofFloat(binding.nameTextView, View.ALPHA, 1f).setDuration(500)
         val btnLogout =
             ObjectAnimator.ofFloat(binding.logoutButton, View.ALPHA, 1f).setDuration(500)
+
+        AnimatorSet().apply {
+            playSequentially(
+                tvName,
+                tvMessage,
+                btnLogout
+            )
+            startDelay = 500
+        }.start()
     }
 }
