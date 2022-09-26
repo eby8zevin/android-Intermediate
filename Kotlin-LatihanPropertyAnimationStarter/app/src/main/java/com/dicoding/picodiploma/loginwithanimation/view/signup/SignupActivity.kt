@@ -122,7 +122,7 @@ class SignupActivity : AppCompatActivity() {
                 etPassword,
                 btnSignup
             )
-            start()
-        }
+            startDelay = 500
+        }.start()
     }
 }
