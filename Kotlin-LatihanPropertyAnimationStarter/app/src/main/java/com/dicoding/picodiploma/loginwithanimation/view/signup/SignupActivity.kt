@@ -1,5 +1,6 @@
 package com.dicoding.picodiploma.loginwithanimation.view.signup
 
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Build
@@ -109,5 +110,19 @@ class SignupActivity : AppCompatActivity() {
             ObjectAnimator.ofFloat(binding.passwordEditTextLayout, View.ALPHA, 1f).setDuration(500)
         val btnSignup =
             ObjectAnimator.ofFloat(binding.signupButton, View.ALPHA, 1f).setDuration(500)
+
+        AnimatorSet().apply {
+            playSequentially(
+                tvTitle,
+                tvName,
+                etName,
+                tvEmail,
+                etEmail,
+                tvPassword,
+                etPassword,
+                btnSignup
+            )
+            start()
+        }
     }
 }
