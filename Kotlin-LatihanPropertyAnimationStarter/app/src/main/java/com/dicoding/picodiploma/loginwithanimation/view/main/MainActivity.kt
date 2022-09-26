@@ -77,5 +77,12 @@ class MainActivity : AppCompatActivity() {
             repeatCount = ObjectAnimator.INFINITE
             repeatMode = ObjectAnimator.REVERSE
         }.start()
+
+        val tvName =
+            ObjectAnimator.ofFloat(binding.nameTextView, View.ALPHA, 1f).setDuration(500)
+        val tvMessage =
+            ObjectAnimator.ofFloat(binding.nameTextView, View.ALPHA, 1f).setDuration(500)
+        val btnLogout =
+            ObjectAnimator.ofFloat(binding.logoutButton, View.ALPHA, 1f).setDuration(500)
     }
 }
