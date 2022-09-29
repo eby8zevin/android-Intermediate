@@ -103,4 +103,9 @@
                 motion:customFloatValue="1" />
         </Constraint>
     </ConstraintSet>
+    <Transition
+        motion:constraintSetStart="@+id/end"
+        motion:constraintSetEnd="@+id/menu2" >
+        <OnSwipe motion:dragDirection="dragLeft" />
+    </Transition>
 </MotionScene>
