@@ -11,6 +11,7 @@
         android:id="@+id/logoMenu1"
         android:layout_width="0dp"
         android:layout_height="300dp"
+        android:layout_marginStart="16dp"
         android:src="@drawable/image_kurikulum_global"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="parent"
@@ -230,7 +231,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <androidx.constraintlayout.utils.widget.ImageFilterView
+    <ImageView
         android:id="@+id/imageView"
         android:layout_width="0dp"
         android:layout_height="100dp"
