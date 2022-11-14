@@ -1,3 +1,38 @@
 <resources>
     <string name="app_name">Story App</string>
+
+    <string name="welcome_register">Daftar Dicoding Story</string>
+    <string name="welcome_login">Login Dicoding Story</string>
+    <string name="desc">Tempat berbagi story seputar Dicoding</string>
+
+    <string name="label_name">Nama</string>
+    <string name="name_cannot_be_empty">Nama tidak boleh kosong</string>
+
+    <string name="label_email">Email</string>
+    <string name="email_cannot_be_empty">Email tidak boleh kosong</string>
+    <string name="invalid_email_address">Alamat email salah</string>
+
+    <string name="label_password">Password</string>
+    <string name="password_cannot_be_empty">Password tidak boleh kosong</string>
+    <string name="password_less_than_6_char">Password kurang dari 6 karakter</string>
+
+    <string name="login">Masuk</string>
+    <string name="register">Daftar</string>
+
+    <string name="already_have_an_account">Sudah punya Akun?</string>
+    <string name="dont_have_an_account">Belum punya Akun?</string>
+
+    <string name="add">Add Story</string>
+
+    <string name="image_story">Story Image</string>
+    <string name="title_story">Story Title</string>
+    <string name="desc_story">Story Desc</string>
+    <string name="date_story">Story Date</string>
+
+    <string name="logout">Logout</string>
+
+    <string name="camera">Kamera</string>
+    <string name="gallery">Galeri</string>
+    <string name="description">Deskripsi</string>
+    <string name="upload">Upload</string>
 </resources>
