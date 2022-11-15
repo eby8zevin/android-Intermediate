@@ -42,16 +42,10 @@ class StoryAdapter(
         fun bind(story: ResponseAllStory.ListStory) {
             with(binding) {
                 val name = story.name
-                tvTitle.text = buildString {
-                    append("Nama: ")
-                    append(name)
-                }
+                tvTitle.text = "Nama: $name"
 
                 val desc = story.description
-                tvDesc.text = buildString {
-                    append("Desc: ")
-                    append(desc)
-                }
+                tvDesc.text = "Desc: $desc"
 
                 tvDate.text = story.createdAt.timeStamp()
 
