@@ -1,6 +1,7 @@
 package com.ahmadabuhasan.storyapp.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
@@ -39,17 +40,6 @@ import java.util.*
 
 class AddStoryActivity : AppCompatActivity() {
 
-    companion object {
-        private const val TAG = "AddStoryActivity"
-
-        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-        private const val REQUEST_CODE_PERMISSIONS = 10
-        private const val REQUEST_CODE = 200
-        private const val IMAGE_CHOOSE = 100
-
-        private const val FILE_NAME = "dd-MMM-yyyy"
-    }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -72,11 +62,17 @@ class AddStoryActivity : AppCompatActivity() {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
-    private var filePhoto: File? = null
     private lateinit var binding: ActivityAddStoryBinding
     private lateinit var sharedPref: SessionManager
+    private lateinit var photoPath: String
     private var token: String? = null
-    private var timeStamp: String? = null
+    private var filePhoto: File? = null
+
+    private var localeID = Locale("in", "ID")
+    private val timeStamp: String = SimpleDateFormat(
+        FILE_NAME,
+        localeID
+    ).format(System.currentTimeMillis())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,11 +90,6 @@ class AddStoryActivity : AppCompatActivity() {
             )
         }
 
-        timeStamp = SimpleDateFormat(
-            FILE_NAME,
-            Locale.US
-        ).format(System.currentTimeMillis())
-
         supportActionBar?.title = "Add Story"
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
@@ -109,24 +100,29 @@ class AddStoryActivity : AppCompatActivity() {
         binding.btnUpload.setOnClickListener { uploadToSever() }
     }
 
+    @SuppressLint("QueryPermissionsNeeded")
     private fun openCamera() {
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
         getPhotoFile(application).also {
-            filePhoto = it.absoluteFile
-        }
+            val providerFile = FileProvider.getUriForFile(
+                this,
+                "com.ahmadabuhasan.androidcamera.fileprovider",
+                it
+            )
+            photoPath = it.absolutePath
 
-        val providerFile = FileProvider.getUriForFile(
-            this,
-            "com.ahmadabuhasan.androidcamera.fileprovider",
-            filePhoto!!
-        )
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerFile)
-        if (cameraIntent.resolveActivity(this.packageManager) != null) {
-            startActivityForResult(cameraIntent, REQUEST_CODE)
-        } else {
-            Toast.makeText(this, "Kamera tidak bisa dibuka, cek permission!", Toast.LENGTH_SHORT)
-                .show()
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerFile)
+            if (cameraIntent.resolveActivity(this.packageManager) != null) {
+                startActivityForResult(cameraIntent, REQUEST_CODE)
+            } else {
+                Toast.makeText(
+                    this,
+                    "Kamera tidak bisa dibuka, cek permission!",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+            }
         }
     }
 
@@ -136,10 +132,10 @@ class AddStoryActivity : AppCompatActivity() {
                 val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
                 requestPermissions(permissions, REQUEST_CODE_PERMISSIONS)
             } else {
-                chooseImageGallery();
+                chooseImageGallery()
             }
         } else {
-            chooseImageGallery();
+            chooseImageGallery()
         }
     }
 
@@ -152,7 +148,9 @@ class AddStoryActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val resultCamera = BitmapFactory.decodeFile(filePhoto?.absolutePath)
+            val myFile = File(photoPath)
+            filePhoto = myFile
+            val resultCamera = BitmapFactory.decodeFile(filePhoto?.path)
             binding.ivPhoto.setImageBitmap(resultCamera)
         } else {
             super.onActivityResult(requestCode, resultCode, data)
@@ -230,7 +228,22 @@ class AddStoryActivity : AppCompatActivity() {
 
     private fun getPhotoFile(context: Context): File {
         val directoryStorage = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(timeStamp!!, ".jpg", directoryStorage)
+        return File.createTempFile(timeStamp, ".jpg", directoryStorage)
+    }
+
+    private fun uriToFile(selectedImg: Uri, context: Context): File {
+        val contentResolver: ContentResolver = context.contentResolver
+        val myFile = getPhotoFile(context)
+
+        val inputStream = contentResolver.openInputStream(selectedImg) as InputStream
+        val outputStream: OutputStream = FileOutputStream(myFile)
+        val buf = ByteArray(1024)
+        var len: Int
+        while (inputStream.read(buf).also { len = it } > 0) outputStream.write(buf, 0, len)
+        outputStream.close()
+        inputStream.close()
+
+        return myFile
     }
 
     private fun reduceFileImage(file: File): File {
@@ -252,21 +265,6 @@ class AddStoryActivity : AppCompatActivity() {
         return file
     }
 
-    private fun uriToFile(selectedImg: Uri, context: Context): File {
-        val contentResolver: ContentResolver = context.contentResolver
-        val myFile = getPhotoFile(context)
-
-        val inputStream = contentResolver.openInputStream(selectedImg) as InputStream
-        val outputStream: OutputStream = FileOutputStream(myFile)
-        val buf = ByteArray(1024)
-        var len: Int
-        while (inputStream.read(buf).also { len = it } > 0) outputStream.write(buf, 0, len)
-        outputStream.close()
-        inputStream.close()
-
-        return myFile
-    }
-
     private fun showLoading(isLoading: Boolean) {
         if (isLoading) {
             binding.progressBar.visibility = View.VISIBLE
@@ -282,5 +280,16 @@ class AddStoryActivity : AppCompatActivity() {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    companion object {
+        private const val TAG = "AddStoryActivity"
+
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        private const val REQUEST_CODE_PERMISSIONS = 10
+        private const val REQUEST_CODE = 200
+        private const val IMAGE_CHOOSE = 100
+
+        private const val FILE_NAME = "dd-MMM-yyyy"
     }
 }
