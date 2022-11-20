@@ -3,7 +3,14 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/NUR AIDA HASANAH/OneDrive/Documents/GitHub/android-Intermediate/Kotlin-SubmissionAkhirAplikasiStoryApp/app/src/main/res/drawable/ic_maps.xml" value="0.1385" />
         <entry key="..\:/Users/NUR AIDA HASANAH/OneDrive/Documents/GitHub/android-Intermediate/Kotlin-SubmissionAkhirAplikasiStoryApp/app/src/main/res/layout/activity_add_story.xml" value="0.1911231884057971" />
+        <entry key="..\:/Users/NUR AIDA HASANAH/OneDrive/Documents/GitHub/android-Intermediate/Kotlin-SubmissionAkhirAplikasiStoryApp/app/src/main/res/layout/activity_login.xml" value="0.1" />
+        <entry key="..\:/Users/NUR AIDA HASANAH/OneDrive/Documents/GitHub/android-Intermediate/Kotlin-SubmissionAkhirAplikasiStoryApp/app/src/main/res/layout/activity_main.xml" value="0.10461956521739131" />
+        <entry key="..\:/Users/NUR AIDA HASANAH/OneDrive/Documents/GitHub/android-Intermediate/Kotlin-SubmissionAkhirAplikasiStoryApp/app/src/main/res/layout/activity_maps.xml" value="0.1" />
+        <entry key="..\:/Users/NUR AIDA HASANAH/OneDrive/Documents/GitHub/android-Intermediate/Kotlin-SubmissionAkhirAplikasiStoryApp/app/src/main/res/layout/fragment_maps.xml" value="0.12273550724637682" />
+        <entry key="..\:/Users/NUR AIDA HASANAH/OneDrive/Documents/GitHub/android-Intermediate/Kotlin-SubmissionAkhirAplikasiStoryApp/app/src/main/res/layout/item_loading.xml" value="0.15625" />
+        <entry key="..\:/Users/NUR AIDA HASANAH/OneDrive/Documents/GitHub/android-Intermediate/Kotlin-SubmissionAkhirAplikasiStoryApp/app/src/main/res/menu/option_menu.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/NUR AIDA HASANAH/OneDrive/Documents/GitHub/android-Intermediate/Kotlin-SubmissionAplikasiStoryApp/app/src/main/res/drawable/bg_edit_text.xml" value="0.1365" />
         <entry key="..\:/Users/NUR AIDA HASANAH/OneDrive/Documents/GitHub/android-Intermediate/Kotlin-SubmissionAplikasiStoryApp/app/src/main/res/drawable/ic_add.xml" value="0.1345" />
         <entry key="..\:/Users/NUR AIDA HASANAH/OneDrive/Documents/GitHub/android-Intermediate/Kotlin-SubmissionAplikasiStoryApp/app/src/main/res/drawable/ic_logout.xml" value="0.1385" />
