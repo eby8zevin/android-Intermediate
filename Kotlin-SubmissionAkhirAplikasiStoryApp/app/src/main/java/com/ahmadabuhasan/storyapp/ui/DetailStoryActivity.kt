@@ -3,14 +3,14 @@ package com.ahmadabuhasan.storyapp.ui
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.ahmadabuhasan.storyapp.databinding.ActivityDetailStoryBinding
-import com.ahmadabuhasan.storyapp.model.ResponseAllStory
+import com.ahmadabuhasan.storyapp.model.ListStory
 import com.ahmadabuhasan.storyapp.utils.Constant
 import com.bumptech.glide.Glide
 
 class DetailStoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailStoryBinding
-    private lateinit var story: ResponseAllStory.ListStory
+    private lateinit var story: ListStory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
