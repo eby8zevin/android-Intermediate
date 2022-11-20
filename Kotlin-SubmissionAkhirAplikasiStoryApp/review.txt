@@ -1,0 +1,8 @@
+StoryAdapter.kt
+
+Hindari penggunaan hardcoded string. Kamu bisa menggunakan strings.xml dengan placeholder seperti ini: 
+
+"Nama: %s"
+ Dan untuk menggunakannya: 
+
+tvTitle.text = resources.getString(R.string.name, items.name)
