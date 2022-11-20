@@ -6,36 +6,43 @@ import com.ahmadabuhasan.storyapp.model.ResponseLogin
 import com.ahmadabuhasan.storyapp.model.ResponseRegister
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.Call
 import retrofit2.http.*
 
 interface ApiService {
 
     @FormUrlEncoded
-    @POST("v1/register")
-    fun register(
+    @POST("register")
+    suspend fun register(
         @Field("name") name: String,
         @Field("email") email: String,
-        @Field("password") password: String
-    ): Call<ResponseRegister>
+        @Field("password") password: String,
+    ): ResponseRegister
 
     @FormUrlEncoded
-    @POST("v1/login")
-    fun login(
+    @POST("login")
+    suspend fun login(
         @Field("email") email: String,
-        @Field("password") password: String
-    ): Call<ResponseLogin>
+        @Field("password") password: String,
+    ): ResponseLogin
 
     @Multipart
-    @POST("v1/stories")
-    fun addNewStory(
+    @POST("stories")
+    suspend fun addNewStory(
         @Header("Authorization") token: String,
         @Part file: MultipartBody.Part,
         @Part("description") description: RequestBody,
-    ): Call<ResponseAddStory>
+    ): ResponseAddStory
 
-    @GET("v1/stories")
-    fun allStory(
-        @Header("Authorization") token: String
-    ): Call<ResponseAllStory>
+    @GET("stories")
+    suspend fun allStory(
+        @Header("Authorization") token: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+    ): ResponseAllStory
+
+    @GET("stories")
+    suspend fun allStoryLocation(
+        @Header("Authorization") token: String,
+        @Query("location") location: Int,
+    ): ResponseAllStory
 }
