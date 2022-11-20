@@ -23,6 +23,7 @@
     <string name="dont_have_an_account">Belum punya Akun?</string>
 
     <string name="add">Add Story</string>
+    <string name="retry">Retry</string>
 
     <string name="image_story">Story Image</string>
     <string name="title_story">Story Title</string>
@@ -35,4 +36,6 @@
     <string name="gallery">Galeri</string>
     <string name="description">Deskripsi</string>
     <string name="upload">Upload</string>
+
+    <string name="maps">Maps</string>
 </resources>
