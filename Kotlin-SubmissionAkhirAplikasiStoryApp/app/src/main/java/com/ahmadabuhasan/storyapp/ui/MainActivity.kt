@@ -2,33 +2,26 @@ package com.ahmadabuhasan.storyapp.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ahmadabuhasan.storyapp.R
+import com.ahmadabuhasan.storyapp.adapter.LoadingStateAdapter
 import com.ahmadabuhasan.storyapp.adapter.StoryAdapter
-import com.ahmadabuhasan.storyapp.api.ApiConfig
 import com.ahmadabuhasan.storyapp.databinding.ActivityMainBinding
-import com.ahmadabuhasan.storyapp.model.ResponseAllStory
 import com.ahmadabuhasan.storyapp.utils.SessionManager
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.ahmadabuhasan.storyapp.viewmodel.StoryViewModel
+import com.ahmadabuhasan.storyapp.viewmodel.ViewModelFactory
 
 class MainActivity : AppCompatActivity() {
 
-    companion object {
-        private const val TAG = "MainActivity"
-    }
-
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var adapter: StoryAdapter
-
     private lateinit var sharedPref: SessionManager
-    private var token: String? = null
+    private lateinit var viewModel: StoryViewModel
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var storyAdapter: StoryAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,47 +29,39 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         sharedPref = SessionManager(this)
-        token = sharedPref.getToken
+        setupViewModel()
+        setupView()
+        getAllStory()
 
+        binding.fab.setOnClickListener { toAddStory() }
+    }
+
+    private fun toAddStory() {
+        startActivity(Intent(this@MainActivity, AddStoryActivity::class.java))
+    }
+
+    private fun setupViewModel() {
+        val factory: ViewModelFactory = ViewModelFactory.getInstance(this)
+        viewModel = ViewModelProvider(this, factory)[StoryViewModel::class.java]
+    }
+
+    private fun setupView() {
+        storyAdapter = StoryAdapter()
         binding.rvStory.layoutManager = LinearLayoutManager(this)
-        binding.rvStory.setHasFixedSize(true)
-        adapter = StoryAdapter(this, arrayListOf())
-        binding.rvStory.adapter = adapter
-        getAllStory("Bearer $token")
-
-        binding.fab.setOnClickListener {
-            startActivity(
-                Intent(
-                    this@MainActivity,
-                    AddStoryActivity::class.java
-                )
+        with(binding.rvStory) {
+            setHasFixedSize(true)
+            adapter = storyAdapter.withLoadStateFooter(
+                footer = LoadingStateAdapter {
+                    storyAdapter.retry()
+                }
             )
         }
     }
 
-    private fun getAllStory(token: String) {
-        val apiService = ApiConfig.getApiService().allStory(token)
-        apiService.enqueue(object : Callback<ResponseAllStory> {
-            override fun onResponse(
-                call: Call<ResponseAllStory>,
-                response: Response<ResponseAllStory>
-            ) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null) {
-                        setData(responseBody.listStory)
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<ResponseAllStory>, t: Throwable) {
-                Log.e(TAG, "onFailure: " + t.message)
-            }
-        })
-    }
-
-    fun setData(data: ArrayList<ResponseAllStory.ListStory>) {
-        adapter.setData(data)
+    private fun getAllStory() {
+        viewModel.vmListStory().observe(this) {
+            storyAdapter.submitData(lifecycle, it)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -100,6 +85,13 @@ class MainActivity : AppCompatActivity() {
                 val alert = alertDialog.create()
                 alert.show()
                 true
+            }
+
+            R.id.action_maps -> {
+                val i = Intent(this, MapsActivity::class.java)
+                startActivity(i)
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left)
+                return true
             }
             else -> return super.onOptionsItemSelected(item)
         }
