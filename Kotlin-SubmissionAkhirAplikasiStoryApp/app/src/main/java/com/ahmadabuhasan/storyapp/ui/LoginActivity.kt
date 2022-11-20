@@ -2,32 +2,26 @@ package com.ahmadabuhasan.storyapp.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.ahmadabuhasan.storyapp.R
-import com.ahmadabuhasan.storyapp.api.ApiConfig
+import com.ahmadabuhasan.storyapp.data.Result
 import com.ahmadabuhasan.storyapp.databinding.ActivityLoginBinding
-import com.ahmadabuhasan.storyapp.model.ResponseLogin
 import com.ahmadabuhasan.storyapp.utils.Constant.KEY_EMAIL
 import com.ahmadabuhasan.storyapp.utils.Constant.KEY_IS_LOGIN
 import com.ahmadabuhasan.storyapp.utils.Constant.KEY_NAME
 import com.ahmadabuhasan.storyapp.utils.Constant.KEY_TOKEN
 import com.ahmadabuhasan.storyapp.utils.Constant.KEY_USER_ID
 import com.ahmadabuhasan.storyapp.utils.SessionManager
-import com.google.gson.Gson
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.ahmadabuhasan.storyapp.viewmodel.StoryViewModel
+import com.ahmadabuhasan.storyapp.viewmodel.ViewModelFactory
 
 class LoginActivity : AppCompatActivity() {
 
-    companion object {
-        private const val TAG = "LoginActivity"
-    }
-
     private lateinit var sharedPref: SessionManager
+    private lateinit var viewModel: StoryViewModel
     private lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,12 +29,18 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        supportActionBar!!.hide()
+        supportActionBar?.hide()
         sharedPref = SessionManager(this)
+        setupViewModel()
 
         binding.tvToRegister.setOnClickListener { toRegister() }
 
         binding.btnLogin.setOnClickListener { checkLogin() }
+    }
+
+    private fun setupViewModel() {
+        val factory: ViewModelFactory = ViewModelFactory.getInstance(this)
+        viewModel = ViewModelProvider(this, factory)[StoryViewModel::class.java]
     }
 
     private fun toRegister() {
@@ -60,18 +60,21 @@ class LoginActivity : AppCompatActivity() {
         } else if (password.isEmpty()) {
             binding.edLoginPassword.requestFocus()
         } else {
-            sendAPI(email, password)
+            sendToAPI(email, password)
         }
     }
 
-    private fun sendAPI(email: String, password: String) {
-        showLoading(true)
-        val apiService = ApiConfig.getApiService().login(email, password)
-        apiService.enqueue(object : Callback<ResponseLogin> {
-            override fun onResponse(call: Call<ResponseLogin>, response: Response<ResponseLogin>) {
-                showLoading(false)
-                if (response.isSuccessful) {
-                    val responseBody = response.body()!!.loginResult
+    private fun sendToAPI(email: String, password: String) {
+        viewModel.vmLogin(email, password).observe(this@LoginActivity) {
+
+            when (it) {
+                is Result.Loading -> {
+                    showLoading(true)
+                }
+
+                is Result.Success -> {
+                    showLoading(false)
+                    val responseBody = it.data.loginResult
                     sharedPref.apply {
                         setBooleanPref(KEY_IS_LOGIN, true)
                         setStringPref(KEY_TOKEN, responseBody.token)
@@ -79,27 +82,18 @@ class LoginActivity : AppCompatActivity() {
                         setStringPref(KEY_NAME, responseBody.name)
                         setStringPref(KEY_EMAIL, email)
                     }
-
                     val i = Intent(this@LoginActivity, MainActivity::class.java)
-                    i.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     startActivity(i)
-                    Toast.makeText(this@LoginActivity, response.body()?.message, Toast.LENGTH_SHORT)
-                        .show()
-                } else {
-                    val loginFailed = Gson().fromJson(
-                        response.errorBody()?.charStream(),
-                        ResponseLogin::class.java
-                    )
-                    Toast.makeText(this@LoginActivity, loginFailed.message, Toast.LENGTH_SHORT)
-                        .show()
+                    finish()
+                }
+
+                is Result.Error -> {
+                    showLoading(false)
+                    Toast.makeText(this, it.error, Toast.LENGTH_SHORT).show()
                 }
             }
-
-            override fun onFailure(call: Call<ResponseLogin>, t: Throwable) {
-                showLoading(false)
-                Log.e(TAG, "onFailure: " + t.message)
-            }
-        })
+        }
     }
 
     private fun showLoading(isLoading: Boolean) {
@@ -117,6 +111,7 @@ class LoginActivity : AppCompatActivity() {
             val i = Intent(this@LoginActivity, MainActivity::class.java)
             i.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(i)
+            finish()
         }
     }
 }

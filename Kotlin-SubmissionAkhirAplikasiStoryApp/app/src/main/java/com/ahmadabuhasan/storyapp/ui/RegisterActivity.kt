@@ -2,25 +2,19 @@ package com.ahmadabuhasan.storyapp.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.ahmadabuhasan.storyapp.R
-import com.ahmadabuhasan.storyapp.api.ApiConfig
+import com.ahmadabuhasan.storyapp.data.Result
 import com.ahmadabuhasan.storyapp.databinding.ActivityRegisterBinding
-import com.ahmadabuhasan.storyapp.model.ResponseRegister
-import com.google.gson.Gson
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.ahmadabuhasan.storyapp.viewmodel.StoryViewModel
+import com.ahmadabuhasan.storyapp.viewmodel.ViewModelFactory
 
 class RegisterActivity : AppCompatActivity() {
 
-    companion object {
-        private const val TAG = "RegisterActivity"
-    }
-
+    private lateinit var viewModel: StoryViewModel
     private lateinit var binding: ActivityRegisterBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,11 +22,17 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        supportActionBar!!.hide()
+        supportActionBar?.hide()
+        setupViewModel()
 
         binding.tvToLogin.setOnClickListener { toLogin() }
 
         binding.btnRegister.setOnClickListener { checkRegister() }
+    }
+
+    private fun setupViewModel() {
+        val factory: ViewModelFactory = ViewModelFactory.getInstance(this)
+        viewModel = ViewModelProvider(this, factory)[StoryViewModel::class.java]
     }
 
     private fun toLogin() {
@@ -55,44 +55,31 @@ class RegisterActivity : AppCompatActivity() {
         } else if (password.isEmpty()) {
             binding.edRegisterPassword.requestFocus()
         } else {
-            sendAPI(name, email, password)
+            sendToAPI(name, email, password)
         }
     }
 
-    private fun sendAPI(name: String, email: String, password: String) {
-        showLoading(true)
-        val apiService = ApiConfig.getApiService().register(name, email, password)
-        apiService.enqueue(object : Callback<ResponseRegister> {
-            override fun onResponse(
-                call: Call<ResponseRegister>,
-                response: Response<ResponseRegister>
-            ) {
-                showLoading(false)
-                if (response.isSuccessful) {
-                    val i = Intent(this@RegisterActivity, MainActivity::class.java)
-                    i.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(i)
-                    Toast.makeText(
-                        this@RegisterActivity,
-                        response.body()?.message,
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                } else {
-                    val loginFailed = Gson().fromJson(
-                        response.errorBody()?.charStream(),
-                        ResponseRegister::class.java
-                    )
-                    Toast.makeText(this@RegisterActivity, loginFailed.message, Toast.LENGTH_SHORT)
-                        .show()
+    private fun sendToAPI(name: String, email: String, password: String) {
+
+        viewModel.vmRegister(name, email, password).observe(this) {
+
+            when (it) {
+                is Result.Loading -> {
+                    showLoading(true)
+                }
+
+                is Result.Success -> {
+                    showLoading(false)
+                    Toast.makeText(this, it.data.message, Toast.LENGTH_SHORT).show()
+                    toLogin()
+                }
+
+                is Result.Error -> {
+                    showLoading(false)
+                    Toast.makeText(this, it.error, Toast.LENGTH_SHORT).show()
                 }
             }
-
-            override fun onFailure(call: Call<ResponseRegister>, t: Throwable) {
-                showLoading(false)
-                Log.e(TAG, "onFailure: " + t.message)
-            }
-        })
+        }
     }
 
     private fun showLoading(isLoading: Boolean) {

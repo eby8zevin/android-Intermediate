@@ -14,7 +14,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -22,18 +21,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.ahmadabuhasan.storyapp.api.ApiConfig
+import androidx.lifecycle.ViewModelProvider
+import com.ahmadabuhasan.storyapp.data.Result
 import com.ahmadabuhasan.storyapp.databinding.ActivityAddStoryBinding
-import com.ahmadabuhasan.storyapp.model.ResponseAddStory
 import com.ahmadabuhasan.storyapp.utils.SessionManager
+import com.ahmadabuhasan.storyapp.viewmodel.StoryViewModel
+import com.ahmadabuhasan.storyapp.viewmodel.ViewModelFactory
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -62,10 +60,11 @@ class AddStoryActivity : AppCompatActivity() {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
-    private lateinit var binding: ActivityAddStoryBinding
     private lateinit var sharedPref: SessionManager
+    private lateinit var viewModel: StoryViewModel
+    private lateinit var binding: ActivityAddStoryBinding
     private lateinit var photoPath: String
-    private var token: String? = null
+
     private var filePhoto: File? = null
 
     private var localeID = Locale("in", "ID")
@@ -78,9 +77,6 @@ class AddStoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAddStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        sharedPref = SessionManager(this)
-        token = sharedPref.getToken
 
         if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(
@@ -95,9 +91,17 @@ class AddStoryActivity : AppCompatActivity() {
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        sharedPref = SessionManager(this)
+        setupViewModel()
+
         binding.btnCamera.setOnClickListener { openCamera() }
         binding.btnGallery.setOnClickListener { openGallery() }
         binding.btnUpload.setOnClickListener { uploadToSever() }
+    }
+
+    private fun setupViewModel() {
+        val factory: ViewModelFactory = ViewModelFactory.getInstance(this)
+        viewModel = ViewModelProvider(this, factory)[StoryViewModel::class.java]
     }
 
     @SuppressLint("QueryPermissionsNeeded")
@@ -176,6 +180,7 @@ class AddStoryActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
         } else {
+
             val description = desc.toRequestBody("text/plain".toMediaType())
             val file = reduceFileImage(filePhoto as File)
             val imageFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
@@ -185,44 +190,31 @@ class AddStoryActivity : AppCompatActivity() {
                 imageFile
             )
 
-            showLoading(true)
-            val apiService =
-                ApiConfig.getApiService().addNewStory("Bearer $token", bodyMultipart, description)
-            apiService.enqueue(object : Callback<ResponseAddStory> {
-                override fun onResponse(
-                    call: Call<ResponseAddStory>,
-                    response: Response<ResponseAddStory>
-                ) {
-                    showLoading(false)
+            val token = "Bearer ${sharedPref.getToken}"
+            viewModel.vmAddNewStory(token, bodyMultipart, description)
+                .observe(this@AddStoryActivity) {
 
-                    if (response.isSuccessful) {
-                        val responseBody = response.body()
-                        if (responseBody != null && !responseBody.error) {
-                            Toast.makeText(
-                                this@AddStoryActivity,
-                                response.message(),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                    when (it) {
+                        is Result.Loading -> {
+                            showLoading(true)
+                        }
 
-                            val intent = Intent(this@AddStoryActivity, MainActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                            startActivity(intent)
+                        is Result.Success -> {
+                            showLoading(false)
+                            Toast.makeText(this, it.data.message, Toast.LENGTH_SHORT)
+                                .show()
+                            val i = Intent(this@AddStoryActivity, MainActivity::class.java)
+                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            startActivity(i)
                             finish()
-                        } else {
-                            Toast.makeText(
-                                this@AddStoryActivity,
-                                responseBody!!.message,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        }
+
+                        is Result.Error -> {
+                            showLoading(false)
+                            Toast.makeText(this, it.error, Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
-
-                override fun onFailure(call: Call<ResponseAddStory>, t: Throwable) {
-                    showLoading(false)
-                    Log.e(TAG, "onFailure: " + t.message)
-                }
-            })
         }
     }
 
@@ -283,8 +275,6 @@ class AddStoryActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val TAG = "AddStoryActivity"
-
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
         private const val REQUEST_CODE_PERMISSIONS = 10
         private const val REQUEST_CODE = 200
