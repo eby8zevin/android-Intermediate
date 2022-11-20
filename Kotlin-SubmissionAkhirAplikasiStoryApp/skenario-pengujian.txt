@@ -1,0 +1,19 @@
+1. AddStoryViewModelTest
+- Memastikan Data AddStory tidal null.
+- Memastikan mengembalikan Result.Success
+
+2. LoginViewModelTest
+- Memastikan Data Login tidal null.
+- Memastikan mengembalikan Result.Success
+
+3. MainViewModelTest
+- Memastikan Data ListStory tidal null.
+- Memastikan jumlah Data sesuai dengan yang diharapkan.
+
+4. MapsViewModelTest
+- Memastikan Data LisStory tidak null.
+- Memastikan mengembalikan Result.Success
+
+5. RegisterViewModelTest
+- Memastikan Data Register tidak null.
+- Memastikan mengembalikan Result.Success
