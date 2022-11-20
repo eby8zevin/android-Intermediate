@@ -1,0 +1,68 @@
+- build.gradle
+
+Library AndroidX Core ini sudah tersedia versi terbarunya yaitu 1.9.0. Silakan diupdate beserta library lainnya ya agar kode yang dituliskan mengikuti best practice dari library yang digunakan.
+
+
+
+- activity_add_story.xml
+
+Ketika menggunakan ConstraintLayout, sebaiknya hindari nested hirarki layout karena dengan ConstraintLayout kamu bisa menyusun tampilan aplikasi yang kompleks tanpa harus melakukan nested.
+
+
+
+- AddStoryActivity.kt
+
+Penulisan companion object sebaiknya diletakkan di paling bawah dari sebuah class sesuai dengan konvensi penulisan kode Kotlin di tautan ini https://kotlinlang.org/docs/reference/coding-conventions.html#class-layout.
+
+Hindari penggunaan double bang operator (!!) saat pengecekan null, karena akan memaksa suatu variable menjadi non-null. Dan jika ternyata variable tersebut bernilai null, maka bisa menyebabkan NPE. Periksa kembali semua kode kamu dan jangan biarkan satupun operator tersebut tersisa.-null
+
+
+
+- ApiConfig.kt
+
+Jika hanya terdapat member statis, kelas ini bisa diubah menjadi seperti berikut:
+
+object ApiConfig {
+    fun getApiService(): ApiService {
+        val loggingInterceptor =
+            HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+
+        val client = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(150, TimeUnit.SECONDS)
+            .readTimeout(150, TimeUnit.SECONDS)
+            .build()
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://story-api.dicoding.dev/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+        return retrofit.create(ApiService::class.java)
+    }
+}
+
+Saat menggunakan logging interceptor, pastikan kembali pesan log hanya akan tampil pada mode debug. Saat informasi sensitif dapat mudah lihat di jendela logcat dan ini membuat penerapan security menyebabkan vuln di mana data yang tampil dapat dimanfaatkan oleh pihak yang tidak bertanggung jawab.
+
+
+
+- EditTextEmail.kt
+
+Text listener ini bisa disesuaikan menjadi seperti berikut:
+
+doOnTextChanged { text, start, before, count ->
+    val email = text.toString()
+    when {
+        email.isEmpty() -> error = context.getString(R.string.email_cannot_be_empty)
+        !email.isEmailValid() -> error =
+            context.getString(R.string.invalid_email_address)
+    }
+}
+
+
+
+- StoryAdapter.kt
+
+Jika tidak terdapat kondisi spesifik, sebaiknya gunakan string template seperti berikut:
+
+tvDesc.text = "Desc: $desc"
