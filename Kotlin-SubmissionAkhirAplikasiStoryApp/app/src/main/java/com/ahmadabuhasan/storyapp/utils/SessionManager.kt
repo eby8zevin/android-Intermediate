@@ -2,6 +2,7 @@ package com.ahmadabuhasan.storyapp.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.ahmadabuhasan.storyapp.model.Token
 import com.ahmadabuhasan.storyapp.utils.Constant.KEY_IS_LOGIN
 import com.ahmadabuhasan.storyapp.utils.Constant.KEY_TOKEN
 import com.ahmadabuhasan.storyapp.utils.Constant.PREFS_NAME
@@ -29,4 +30,9 @@ class SessionManager(context: Context) {
 
     val isLogin = sharedPref.getBoolean(KEY_IS_LOGIN, false)
     val getToken = sharedPref.getString(KEY_TOKEN, "")
+
+    fun getToken(): Token {
+        val token = sharedPref.getString(KEY_TOKEN, "")
+        return Token(token)
+    }
 }
