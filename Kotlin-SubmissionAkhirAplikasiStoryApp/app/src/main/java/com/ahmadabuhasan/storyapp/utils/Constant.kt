@@ -2,7 +2,7 @@ package com.ahmadabuhasan.storyapp.utils
 
 object Constant {
 
-    const val PREFS_NAME = "story.app_pref"
+    const val PREFS_NAME = "story_app_pref"
 
     const val KEY_IS_LOGIN = "key_login"
     const val KEY_TOKEN = "key_token"
